@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+
+<body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <h1>剩餘車位</h1>
+  <h1 id="space_no"></h1>
+  <!--目前剩餘車位數量會顯示在這邊-->
+  <h1>一個小時20元</h1>
+  <h3 id="time_now"></h3>
+  <!--動態顯示幕前時間-->
+  <br><br>
+  <form method="post" action="/">
+    <!-- method="post"用post的方法傳送資料 action="/" post之後頁面導向主頁面  -->
+    <input type="text" name="car_search" id="car_search">
+    <!--輸入車號，從資料庫撈出目前資料-->
+    <button type="button" id="btn_search" name="btn_search">搜尋</button>
+    <br><br><br>
+    <input type="text" name="price" id="price">
+    <!--輸入要繳費的金額-->
+    <button type="button" id="btn_pay" name="btn_pay">付錢</button>
+
+    <h4>車號:</h4>
+    <h4 id="car_no"></h4> 
+
+    <h4>停車格號碼:</h4>
+    <h4 id="car_place"></h4>
+
+    <h4>進場時間:</h4>
+    <h4 id="enter_time"></h4>
+
+    <h4>實繳金額:</h4>
+    <h4 id="car_paid"></h4>
+
+    <h4>應繳金額:</h4>
+    <h4 id="car_price"></h4> 
+    <h4>最有可能的車號:</h4>
+    <h4 id="car_first"></h4> 
+    <h4>第二可能的車號:</h4>
+    <h4 id="car_second"></h4> 
+    <h4>第三可能的車號:</h4>
+    <h4 id="car_third"></h4>
+
+    <div id="choose_group">
+      <div id="choose_car">請選擇您的車子</div>
+      <img id="img_first"  width="200" height="100"></img>
+      <img id="img_second" width="200" height="100"></img>
+      <img id="img_third" width="200" height="100"></img>
+    </div>
+  </form>
+
+  <script>
+
+//============動態目前時間刷新============
+    var time_now1 = setInterval(time, 1000);
+    function time() {
+
+      document.getElementById('time_now').innerText = new Date(Date.now());
+    }
+//============動態目前時間刷新============
+//=========刷新所有資料，要抓車子資料可以從這邊找==============
+
+    var all_data = "";//全域變數，所有車子的資料(從資料庫撈)都在這邊，每0.5秒會更新一次
+    setInterval(alldata2, 500);//每0.5秒更新一次
+
+    function alldata2() {
+
+      $.ajax({
+        method: "POST",
+        url: "/alldata",
+        data: {
+
+        },
+        success: function (result) {
+          all_data = result;
+        }
+      });
+    }
+//=========刷新所有資料，要抓車子資料可以從這邊找==============
+//---------------每秒更新一次，更新停車場目前空位-----------------
+    setInterval(alldata1, 1000);
+    var j = 0;
+    function alldata1() {
+      var j=0;
+      for(i=0;i<all_data.length;i++)
+      {
+        if(all_data[i].state == "ENTER"){j--;};
+      }
+      space = 500+j;
+      document.getElementById('space_no').innerText = space;
+    }
+
+//---------------每秒更新一次，更新停車場目前空位-----------------
+
+//=============車號搜尋，顯示車牌號碼、進場時間、實繳金額、應繳金額===================   
+    $("#btn_search").click(function () {
+
+      console.log($('#car_search').val());
+
+      $.ajax({
+        method: "POST",
+        url: "/search",
+        data: {
+          parameter2: $('#car_search').val(),
+        },
+        success: function (result) {
+          console.log('submit ok!');
+          // data1 = JSON.parse(result);
+          z1 = result.car_no;
+          z2 = result.enter_time;
+          z3 = result.paid;
+          z4 = result.price;
+          z5 = result.first;
+          z6 = result.second;
+          z7 = result.third;
+          z8 = result.place;
+          //------------照片顯示-------------
+          document.getElementById("img_first").src = `http://localhost/img/${z5}.jpg`;
+          document.getElementById("img_second").src = `http://localhost/img/${z6}.jpg`;
+          document.getElementById("img_third").src = `http://localhost/img/${z7}.jpg`;
+          //------------照片顯示---------------
+
+          document.getElementById('car_no').innerText = z1; //車牌號碼
+          document.getElementById('enter_time').innerText = z2; //進場時間
+          document.getElementById('car_paid').innerText = z3; //實繳金額
+          document.getElementById('car_price').innerText = z4; //應繳金額
+          document.getElementById('car_first').innerText = z5; 
+          document.getElementById('car_second').innerText = z6; 
+          document.getElementById('car_third').innerText = z7; 
+          document.getElementById('car_place').innerText = z8; 
+        }
+      });
+    });
+//=============車號搜尋，顯示車牌號碼、進場時間、實繳金額、應繳金額=================== 
+
+//=====================付款更新資料=======================
+    $("#btn_pay").click(function () {
+
+      console.log($('#price').val());
+
+      $.ajax({
+        method: "POST",
+        url: "/pay",
+        data: {
+          parameter2: $('#car_search').val(),
+          parameter3: $('#price').val(),
+        },
+        success: function (result) {
+          console.log(result);
+          if(result.refund !=0 && result.less==0)
+          {
+            // var a = `繳費成功找您${result.refund} 元`;
+            alert(`繳費成功找您${result.refund} 元`);
+          }         
+          else if(result.refund ==0 && result.less!=0)
+          {
+            alert(`還有${result.less} 元`);
+          }
+          else
+          {
+            alert("繳費完成，記得拿發票喔");
+          }
+        }
+      });
+    });
+//=====================付款更新資料=======================
+
+    </script> 
+  </body>
+</html>
