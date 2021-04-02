@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <style>
+    body{
+      text-align: center;
+      background-color: yellow;
+      font-family: 'Microsoft JhengHei';
+    }
+  </style>
+</head>
+
+<body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <h1>XOXO停車場 <span class="badge bg-secondary">New</span></h1>
+  <br>
+  <h1>剩餘車位</h1>
+  <span class="badge rounded-pill bg-danger">Danger</span>
+  <br><br><br>
+  <div class="position-relative">
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <nav aria-label="..." class="text-center">
+        <ul class="pagination pagination-lg">
+          <li class="page-item"><a class="page-link" href="#" id="aa">1</a></li>
+          <li class="page-item"><a class="page-link" href="#" id="bb">2</a></li>
+          <li class="page-item"><a class="page-link" href="#" id="cc">3</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <br><br>
+  <h1>一個小時20元</h1>
+  <h6 id="time_now"></h6>
+  <!--動態顯示幕前時間-->
+  <script>
+
+//============動態目前時間刷新============
+    var time_now1 = setInterval(time, 1000);
+    function time() {
+
+      document.getElementById('time_now').innerText = new Date(Date.now());
+    }
+//============動態目前時間刷新============
+//=========刷新所有資料，要抓車子資料可以從這邊找==============
+
+    setInterval(alldata2, 500);//每0.5秒更新一次
+
+    function alldata2() {
+
+      $.ajax({
+        method: "POST",
+        url: "/alldata",
+        data: {
+
+        },
+        success: function (result) {
+          var j=0;
+          for(i=0;i<result.length;i++)
+          {
+            if(result[i].state == "ENTER"){j--;};
+          }
+          space = 500+j;
+          var space_str = space.toString();
+
+          document.getElementById('aa').innerText = space_str.slice(0,1);
+          document.getElementById('bb').innerText = space_str.slice(1,2);
+          document.getElementById('cc').innerText = space_str.slice(2,3);
+
+        }
+      });
+    }
+//=========刷新所有資料，要抓車子資料可以從這邊找==============
+    </script> 
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+  </body>
+</html>
