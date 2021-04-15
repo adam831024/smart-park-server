@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>map</title>
+    <style type="text/css">
+      body{
+        text-align:center;
+      }
+      #layout{
+        position: absolute;
+        z-index: -1;
+        margin: 0px;
+        padding: 0px;
+        opacity: 25%;
+        width: 100%;
+        height: 100%;
+        background-size: cover; 
+      }
+      h1{
+        color: RoyalBlue;
+        font-size:40px;
+
+      }
+
+      input{
+        font-size:20px;
+      }
+      button{
+        color:#FFB90F;
+        font-size:20px;
+        background-color:##5F9EA0;
+        margin-left:10px;
+        border-radius:10px;
+      }
+
+      #place_search{
+        stroke:#1C1C1C;
+        stroke-width:5px;
+        stroke-linecap: round;
+      }
+  </style>
+  </head>
+  <!-- 改這 -->
+  <body style="margin-top: 0; margin-left: 0;">
+    <div id="layout"></div>
+    <h1>車位查詢</h1>
+    <div>
+      <span>
+       <input type="text" id="place_search" name="place_search" />
+       <button type="button" id="place_button" name="place_button">查詢</button>
+      </span>
+      <br><br>
+      <button type="button" id="return">返回繳費畫面</button>
+    </div>
+
+    <svg width="800" height="1300" stroke="black" viewbox="0,0,800,1300" preserveAspectRatio="xMinYMin slice">
+      <rect x="0" y="100"width="800" height="1100" 
+      style="fill:white;stroke-width:5;stroke:dimgray"/>
+      <polyline points="100 200,100 1100,600 1100" fill="white" stroke="dimgray" stroke-width="2"/>
+      <polyline points="200 200,700 200,700 1100" fill="white" stroke="dimgray" stroke-width="2"/>
+      <rect x="200" y="350" width="400" height="600" fill="slategray" stroke="lightsteelblue" stroke-width="5"/>
+      <line x1="400"y1="350"x2="400"y2="950" stroke="lightsteelblue" stroke-width="5"/>
+      <line x1="200"y1="550"x2="600"y2="550" stroke="lightsteelblue" stroke-width="5"/>
+      <line x1="200"y1="750"x2="600"y2="750" stroke="lightsteelblue" stroke-width="5"/>
+      <line x1="400"y1="750"x2="600"y2="950" stroke="lightsteelblue" stroke-width="5"/>
+      <line x1="400"y1="950"x2="600"y2="750" stroke="lightsteelblue" stroke-width="5"/>
+      <polygon points="140 120,160 120,160 150,170 150,150 180,130 150,140 150" fill="MediumAquaMarine" stroke="PowderBlue" stroke-width="2"/>
+      <polygon points="640 1120,660 1120,660 1150,670 1150,650 1180,630 1150,640 1150" fill="MediumAquaMarine" stroke="PowderBlue" stroke-width="2"/>
+      <text x="60" y="160" fill="MediumAquaMarine" stroke="MediumAquaMarine" stroke-width="1">入口</text>
+      <text x="690" y="1150" fill="MediumAquaMarine" stroke="MediumAquaMarine" stroke-width="1">出口</text>
+      <text x="220" y="450" text-anchor="middle" writing-mode="tb" fill="lightsteelblue" stroke="lightsteelblue" stroke-width="1">AO1</text>
+      <text x="220" y="650" text-anchor="middle" writing-mode="tb" fill="lightsteelblue" stroke="lightsteelblue" stroke-width="1">AO2</text>
+      <text x="220" y="850" text-anchor="middle" writing-mode="tb" fill="lightsteelblue" stroke="lightsteelblue" stroke-width="1">AO3</text>
+      <text x="580" y="450" text-anchor="middle" writing-mode="tb" rotate="180" fill="lightsteelblue" stroke="lightsteelblue" stroke-width="1">10 B</text>
+      <text x="580" y="650" text-anchor="middle" writing-mode="tb" rotate="180" fill="lightsteelblue" stroke="lightsteelblue" stroke-width="1">20 B</text>
+      <text x="560" y="850" text-anchor="middle" writing-mode="tb" textLength="100" lengthAdjust="spacingAndGlyphs" fill="lightsteelblue" stroke="none">公務用</text>
+      <text x="580" y="850" text-anchor="middle" writing-mode="tb" textLength="100" lengthAdjust="spacingAndGlyphs" fill="lightsteelblue" stroke="none">停車位</text>
+      <rect x="510" y="150" width="20" height="50" fill="gold" stroke="none"/>
+      <circle cx="560" cy="150" r="10" fill="NavajoWhite" stroke="none"/>
+      <circle cx="560" cy="175" r="15" fill="NavajoWhite" stroke="none"/>
+      <line x1="545" y1="155" x2="555" y2="173" stroke="NavajoWhite" stroke-width="3"/> 
+      <line x1="565" y1="173" x2="575" y2="155" stroke="NavajoWhite" stroke-width="3"/>
+      <line x1="545" y1="195" x2="555" y2="180" stroke="NavajoWhite" stroke-width="3"/>
+      <line x1="565" y1="180" x2="575" y2="195" stroke="NavajoWhite" stroke-width="3"/>
+      <text x="500" y="130" fill="gold" stroke="none">您的位置</text>
+      <svg  id="place" viewbox="0,0,800,1100">
+        <g id="place_a01">
+          <path  d="M560 100 L560 200 L150 200 L150 350 L200 350" fill="transparent" stroke="OliveDrab" stroke-width="5" stroke-dasharray="5" class="line1"/>
+        </g>
+        <g id="place_a02">
+          <path id="A02" d="M560 100 L560 200 L150 200 L150 550 L200 550" fill="transparent" stroke="OliveDrab" stroke-width="5" stroke-dasharray="5" class="line2"/>
+        </g>
+        <g id="place_a03">
+          <path id="A03" d="M560 100 L560 200 L150 200 L150 750 L200 750" fill="transparent" stroke="OliveDrab" stroke-width="5" stroke-dasharray="5" class="line3"/>
+        </g>
+        <g id="place_b01">
+          <path id="B01" d="M560 100 L560 200 L650 200 L650 350 L600 350" fill="transparent" stroke="OliveDrab" stroke-width="5" stroke-dasharray="5" class="line4"/>
+        </g>
+        <g id="place_b02">
+          <path id="B02" d="M560 100 L560 200 L650 200 L650 550 L600 550" fill="transparent" stroke="OliveDrab" stroke-width="5" stroke-dasharray="5" class="line5"/>
+        </g>
+    </svg>
+    </svg>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+
+      place_a01.style.display='none';
+      place_a02.style.display='none';
+      place_a03.style.display='none';
+      place_b01.style.display='none';
+      place_b02.style.display='none';
+      var a = document.getElementById("place_search");
+
+      function show(){
+        if (a.value == "A01") place_a01.style.display='block';
+        else if (a.value == "A02") place_a02.style.display='block';
+        else if (a.value == "A03") place_a03.style.display='block';
+        else if (a.value == "B01") place_b01.style.display='block';
+        else if (a.value == "B02") place_b02.style.display='block';
+      }
+      place_button.onclick = show;
+
+      $("#return").on('click',function (){
+          self.location='pay.html';
+          
+          });
+    </script>  
+   </body>
+</html>   

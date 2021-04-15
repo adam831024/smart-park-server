@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>停車場繳費介面</title>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+
+    <style>
+      body{
+        text-align: center;
+      }
+
+      #layout{
+        position: absolute;
+        z-index: -1;
+        margin: 0px;
+        padding: 0px;
+        opacity: 25%;
+        width: 100%;
+        height: 100%;
+        background: url(http://192.168.5.161/car_related/images/sea_wp.jpg) no-repeat;
+        background-position: center;
+        background-size: cover; 
+      }
+
+      img[id=logo]{
+        position: fixed;
+        bottom: 0;
+        right: 0;
+      }
+
+      h1{
+        color: orangered;
+        margin-top: 0px;
+        font-size: 50px;
+      }
+
+      #clock{
+        text-align: right !important; 
+      }
+
+      form{
+        margin: auto;
+      }
+
+      #car_label,#choose_car,#payment_label{
+        font-size: 30px;
+        color: blue;
+        font-weight: bold;
+        margin-top: 30px;
+      }
+
+      label{
+        font-size: 20px;
+        color: green;
+        margin-right: 10px;
+      }
+
+      input{
+        font-size: 20px;
+      }
+
+
+      #enter_time, #pay_time{
+        font-size: 20px;
+        text-align: center;
+      }
+      #car_price, #car_place{
+        font-size: 20px;
+        text-align: center;
+      }
+
+      button{
+        color: indigo;
+        font-size: 20px;
+        background-color: lemonchiffon;
+        margin-left: 10px;
+        border-radius: 10px;
+      }
+
+      button[name=choice]{
+        color: black;
+        font-size: 20px;
+        margin:  15px 125px 10px 125px;
+      }
+
+      img{
+        margin-right: 5px;
+      }
+      
+    </style>
+  </head>
+  <body style="margin-top: 0; margin-left: 0;">
+    <div id="layout"></div>
+    <img id="logo" src="http://192.168.5.161/car_related/images/park.jpg" width="150" height="150"></img>
+    <h1>IoT Parking Lot</h1>
+    <h4 id="clock">TIME</h4>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <form method="post" action="/">     
+      <div id="license_group">
+        <div id="car_label">請輸入車牌號碼</div>
+        <span>
+          <input type="text" name="car_search" id="car_search">
+
+          <button type="button" name="btn_search" id="btn_search">查詢</button>
+        </span>
+      </div>
+
+      <div id="choose_group">
+        <div id="choose_car">請選擇您的車子</div>
+        <div>
+        <img id="img_first"  width="300" height="200"/></img>
+        <img id="img_second"  width="300" height="200"/></img>
+        <img id="img_third"  width="300" height="200" /></img>
+        </div>
+        <br>
+        <button type="button" name="choice" id="choice_01">選擇</button>
+        <button type="button" name="choice" id="choice_02">選擇</button>
+        <button type="button" name="choice" id="choice_03">選擇</button>
+      </div>
+    </form>
+
+      <br><br><br>
+      <div id="money_group">
+        <label id="car_place_label">停車格號碼</label>
+        <textarea id="car_place" rows="1" cols="20">...</textarea>
+        <button type="buttton" name="place_search" id="place_search">搜尋車位</button>
+        <br><br>
+        <label id="enter_time_label">入場時間</label>
+        <textarea id="enter_time"  rows="1" cols="30">...</textarea>
+        <br><br>
+        <label id="car_price_label">應繳金額</label>
+        <textarea id="car_price" rows="1" cols="30">...</textarea>
+        <br><br>
+        <label id="car_paid_label">實繳金額</label>
+        <input type="text" id="car_paid">
+        <br><br><br>
+        <button type="button" name="btn_pay" id="btn_pay">確認繳費</button>
+      </div>
+      
+
+    </form>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+      setInterval("clock.innerHTML=new Date().toLocaleString()+' 星期'+'日一二三四五六'.charAt(new Date().getDay());",1000); 
+
+    //=========刷新所有資料，要抓車子資料可以從這邊找==============
+        var first_no = 0;
+        var second_no = 0;
+        var third_no = 0;
+        var car_moneypaid = "";
+        var all_data = "";//全域變數，所有車子的資料(從資料庫撈)都在這邊，每0.5秒會更新一次
+        setInterval(alldata2, 500);//每0.5秒更新一次
+
+        var enter_time_first = '';
+        var enter_time_second = '';
+        var enter_time_third = '';
+
+        function alldata2() {
+
+          $.ajax({
+            method: "POST",
+            url: "/alldata",
+            data: {
+
+            },
+            success: function (result) {
+              all_data = result;
+            }
+          });
+        }
+    //=========刷新所有資料，要抓車子資料可以從這邊找==============
+
+      // ---- search
+    $("#btn_search").click(function () {
+
+      console.log($('#car_search').val());
+
+      $.ajax({
+        method: "POST",
+        url: "/search",
+        data: {
+          parameter2: $('#car_search').val(),
+        },
+        success: function (result) {
+          console.log('submit ok!');
+          // data1 = JSON.parse(result);
+          z1 = result.car_no;
+          // z2 = result.enter_time;
+          z3 = result.paid;
+          z4 = result.price;
+          z5 = result.first;
+          z6 = result.second;
+          z7 = result.third;
+          z8 = result.place;
+          enter_time_first = result.enter_time;
+          enter_time_second = result.second_entertime;
+          enter_time_third = result.third_entertime;
+
+          first_no = result.first_no;
+          second_no = result.second_no;
+          third_no = result.third_no;
+          console.log("first的資料:", all_data[result.first_no]);          
+          console.log("second的資料:", all_data[result.second_no]);
+          console.log("third的資料:", all_data[result.third_no]);
+
+          //------------照片顯示-------------
+          document.getElementById("img_first").src = `http://192.168.5.161/img/${z5}.jpg`;
+          document.getElementById("img_second").src = `http://192.168.5.161/img/${z6}.jpg`;
+          document.getElementById("img_third").src = `http://192.168.5.161/img/${z7}.jpg`;
+          //------------照片顯示--------------- 
+        }
+      });
+    });
+      // --- success
+      $("#btn_pay").click(function () {
+
+          console.log($('#car_pay').val());
+
+            $.ajax({
+              method: "POST",
+              url: "/pay",
+              data: {
+                parameter2: car_moneypaid,
+                parameter3: $('#car_paid').val(),
+              },
+              success: function (result) {
+                console.log(result);
+                console.log("car_paid",$('#car_paid').val());
+                console.log("car_moneypaid",car_moneypaid);
+                if(result.refund !=0 && result.less==0)
+                {
+                  // var a = `繳費成功找您${result.refund} 元`;
+                  alert(`繳費成功找您${result.refund} 元`);
+                }         
+                else if(result.refund ==0 && result.less!=0)
+                {
+                  alert(`還有${result.less} 元`);
+                }
+                else
+                {
+                  alert("繳費完成，記得拿發票喔");
+                }
+              }
+            });
+        });
+
+      choose_group.style.display = 'none';
+      money_group.style.display = 'none';
+
+      function user_choice(){
+        choose_group.style.display = 'block';
+      }
+
+      function user_payment(){
+        var s;
+        function show_info(z2){
+          var str = z2;
+          var year = str.substr(0,4);
+          var month = str.substr(5,2);
+          var day = str.substr(8,2);
+          var time = str.substr(11,8);
+
+          document.getElementById("enter_time").innerHTML = year + "/" + month + "/" + day + "  " + time;
+          // document.getElementById("pay_time").innerHTML = pdate + " " + ptime;
+          // document.getElementById('car_price').innerText = "$ " + z4;
+          // document.getElementById('car_place').innerText = z8;
+        }
+
+        $("#place_search").on('click',function (){
+          self.location='map.html';
+          
+          });
+
+        switch(event.target.id){
+          case 'car_first':
+            img_group.style.display = 'none';
+            btn_search.style.display = 'none';
+            money_group.style.display = 'block';          
+          break;
+
+          case 'car_second':
+            img_group.style.display = 'none';
+            btn_search.style.display = 'none';
+            money_group.style.display = 'block';
+          break;
+
+          case 'car_third':
+            img_group.style.display = 'none';
+            btn_search.style.display = 'none';
+            money_group.style.display = 'block';
+          break;
+
+          case 'choice_01':
+            choose_group.style.display = 'none';
+            btn_search.style.display = 'none';
+            money_group.style.display = 'block';
+            document.getElementById('car_place').innerText = all_data[first_no].place;
+            // document.getElementById('enter_time').innerText = all_data[first_no].enter_time;
+            document.getElementById('car_price').innerText ="$ "+ all_data[first_no].price;
+            car_moneypaid = all_data[first_no].car_no;
+            show_info(enter_time_first);
+          break;
+
+          case 'choice_02':
+            choose_group.style.display = 'none';
+            btn_search.style.display = 'none';
+            money_group.style.display = 'block';
+            document.getElementById('car_place').innerText = all_data[second_no].place;
+            // document.getElementById('enter_time').innerText = all_data[second_no].enter_time;
+            document.getElementById('car_price').innerText ="$ "+ all_data[second_no].price;
+            car_moneypaid = all_data[second_no].car_no;
+            show_info(enter_time_second);
+          break;
+
+          case 'choice_03':
+            choose_group.style.display = 'none';
+            btn_search.style.display = 'none';
+            money_group.style.display = 'block';
+            document.getElementById('car_place').innerText = all_data[third_no].place;
+            // document.getElementById('enter_time').innerText = all_data[third_no].enter_time;
+            document.getElementById('car_price').innerText ="$ "+ all_data[third_no].price;
+            car_moneypaid = all_data[third_no].car_no;
+            show_info(enter_time_third);
+          break;
+
+        }
+        
+      }
+
+      btn_search.onclick = user_choice;
+      choice_01.onclick = user_payment;
+      choice_02.onclick = user_payment;
+      choice_03.onclick = user_payment;
+
+      
+    </script>
+ 
+  </body>
+</html>
